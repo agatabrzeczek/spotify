@@ -14,6 +14,7 @@ import json
 import base64
 from PIL import Image, ImageOps
 from io import BytesIO
+from flask import *
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -26,9 +27,11 @@ AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 API_BASE_URL = 'https://api.spotify.com/v1/'
 
+PLAYLIST_NAMES = {}
+
 @app.route('/')
 def index():
-    return "Welcome to my Spotify App <a href='/login'>Login with Spotify<a/>"
+    return render_template('index.html')
 
 @app.route('/login')
 def login():
@@ -112,7 +115,7 @@ def sort_saved_songs():
     if (artist_genres == None):
         return 'error'
 
-    return artist_genres
+    return 'artist_genres'
 
 def get_saved_songs(cursor, connection):
 
@@ -278,9 +281,10 @@ def update_genre_file(cursor, connection):
     
     for item in genres:
         genre_name = item[0]
-        sql_statement = f'''INSERT OR IGNORE INTO genres(name) VALUES(?);'''
-        cursor.execute(sql_statement, (genre_name,))
-        connection.commit()
+        if genre_name != None:
+            sql_statement = f'''INSERT OR IGNORE INTO genres(name) VALUES(?);'''
+            cursor.execute(sql_statement, (genre_name,))
+            connection.commit()
 
 def group_songs_by_genre(cursor, connection):
 
@@ -334,7 +338,7 @@ def group_songs_by_decade(cursor, connection):
         song_id = item[0]
         year = item[1]
 
-        decade = str(year - (year % 10))
+        decade = str(year - (year % 10)) + 's'
 
         if decade not in songs_by_decade:
             songs_by_decade[decade] = []
@@ -419,7 +423,7 @@ def initialize_playlists(songs_by_genre, songs_by_decade):
                     playlist_ids[playlist_criterion] = playlist['id']
             for playlist_criterion in criterias:
                 if playlist_ids[playlist_criterion] == '':
-                    if playlist['name'] == playlist_criterion:
+                    if playlist['name'] == f'Your {playlist_criterion} songs by Agata':
                         playlist_ids[playlist_criterion] = playlist['id']
     except KeyError:
         print(playlists)
@@ -438,7 +442,7 @@ def initialize_playlists(songs_by_genre, songs_by_decade):
             if (playlist_criterion in PLAYLIST_NAMES):
                 data['name'] = PLAYLIST_NAMES[playlist_criterion]
             else:
-                data['name'] = playlist_criterion
+                data['name'] = f'Your {playlist_criterion} songs by Agata'
             response = requests.post(API_BASE_URL + f'users/{user_id}/playlists', headers=headers, json=data)
             playlist_ids[playlist_criterion] = response.json()['id']
 
@@ -452,7 +456,7 @@ def update_playlist_cover_arts(playlist_ids, cursor, connection):
 
     for criterion in playlist_ids:
         try:
-            cursor.execute(f"SELECT count(*), album_id FROM songs WHERE year >= {int(criterion)} AND year < {int(criterion) + 10} GROUP BY album_id ORDER BY count(*) DESC;")
+            cursor.execute(f"SELECT count(*), album_id FROM songs WHERE year >= {int(criterion[0:-1])} AND year < {int(criterion[0:-1]) + 10} GROUP BY album_id ORDER BY count(*) DESC;")
         except ValueError:
             cursor.execute(f"SELECT genres.mapping_result, songs.album_id, count(*) FROM songs JOIN artists ON songs.artist_id = artists.id JOIN genres ON artists.genre = genres.name WHERE genres.mapping_result = '{criterion}' group by songs.album_id ORDER BY count(*) desc;")
 
@@ -480,19 +484,19 @@ def update_playlist_cover_arts(playlist_ids, cursor, connection):
                 color = '#11443a'
             case 'rock':
                 color = '#420f18'
-            case '1960':
+            case '1960s':
                 color = '#653200'
-            case '1970':
+            case '1970s':
                 color = '#031d41'
-            case '1980':
+            case '1980s':
                 color = '#ffbe00'
-            case '1990':
+            case '1990s':
                 color = '#ff4d00'
-            case '2000':
+            case '2000s':
                 color = '#0000ff'
-            case '2010':
+            case '2010s':
                 color = '#ff0b4f'
-            case '2020':
+            case '2020s':
                 color = '#ffffff'
             case _:
                 color = '#00000000'
@@ -530,7 +534,7 @@ def refresh_token():
 
         return redirect('/sort-saved-songs')
 
-debug_local = True
+debug_local = False
 pickling = False
 
 if __name__ == '__main__':
