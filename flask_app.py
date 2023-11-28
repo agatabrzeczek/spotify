@@ -101,7 +101,7 @@ def sort_saved_songs():
     if (songlist == 401):
         return redirect('/refresh-token')
     if (songlist == 403):
-        return 'error 403'
+        return render_template('unauthorized.html')
 
     artist_genres = get_artist_genres(cursor, connection)
     if (artist_genres == 401):
