@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  agata-website:
+    build: ./spotify
+    ports:
+      - 8003:80
+    command: python flask_app.py
+    volumes:
+      - ./spotify/:/usr/src/app/
+    environment:
+      LETSENCRYPT_HOST: agatab.crabdance.com
+      VIRTUAL_HOST: agatab.crabdance.com
+
+networks:
+  default:
+    external:
+      name: reverse-proxy
