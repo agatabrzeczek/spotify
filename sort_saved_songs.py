@@ -76,7 +76,7 @@ def sort_saved_songs():
     if 'access_token' not in session:
         return redirect('/login')
 
-    if datetime.now().timestamp() > session['expires_at']:
+    if datetime.now().timestamp() >= session['expires_at']:
         return redirect('/refresh-token')
 
     connection = sqlite3.connect('./spotify.db')
@@ -96,6 +96,8 @@ def sort_saved_songs():
     songlist = get_saved_songs(cursor, connection)
     if (songlist == 401):
         return redirect('/refresh-token')
+    if (songlist == 403):
+        return 'error 403'
 
     artist_genres = get_artist_genres(cursor, connection)
     if (artist_genres == 401):
@@ -126,32 +128,36 @@ def get_saved_songs(cursor, connection):
             'Authorization': f"Bearer {session['access_token']}"
         }
 
-        with open("debug_files/debug_saved_songs.pickle", "wb") as debug_saved_tracks:
-            i = 0
-            while True:
-                response = requests.get(API_BASE_URL + f'me/tracks?offset={i}&limit=50', headers=headers)
+        i = 0
+        while True:
+            response = requests.get(API_BASE_URL + f'me/tracks?offset={i}&limit=50', headers=headers)
+            try:
                 tracks = response.json()
-                if (pickling == True):
+            except Exception as e:
+                print(e)
+                return 403
+
+            if (pickling == True):
+                with open("debug_files/debug_saved_songs.pickle", "wb") as debug_saved_tracks:
                     pickle.dump(tracks, debug_saved_tracks)
-                add_tracks_to_database(tracks, cursor, connection)
-                if (len(tracks['items']) < 50):
-                    break
-                i += 50
+            add_tracks_to_database(tracks, cursor, connection)
+            if (len(tracks['items']) < 50):
+                break
+            i += 50
 
     else:
-        with open("debug_files/debug_saved_songs.pickle", "rb") as debug_saved_tracks:
             while True:
                 try:
-                    tracks = pickle.load(debug_saved_tracks)
-                    add_tracks_to_database(tracks, cursor, connection)
-
+                    with open("debug_files/debug_saved_songs.pickle", "rb") as debug_saved_tracks:
+                        tracks = pickle.load(debug_saved_tracks)
+                        add_tracks_to_database(tracks, cursor, connection)
                 except EOFError:
                     break
 
     status_code = get_song_years(tracks, cursor, connection)
     if status_code != 200:
         return 401
-    
+
     return jsonify(tracks)
 
 def add_tracks_to_database(songs, cursor, connection):
@@ -212,32 +218,32 @@ def get_artist_genres(cursor, connection):
         amount = len(artist_ids)
         no_of_batches = math.ceil(amount/50)
 
-        with open("debug_files/debug_artists.pickle", "wb") as debug_artists:
-            for i in range(0, no_of_batches):
-                ids_parameter = ''
-                for id in artist_ids[(i*50):(i*50+49)]:
-                    ids_parameter += id[0] + '%2C'
-                if (len(artist_ids[(i*50):(i*50+49)]) == 49):
-                    ids_parameter += artist_ids[(i*50+49)][0]
+        for i in range(0, no_of_batches):
+            ids_parameter = ''
+            for id in artist_ids[(i*50):(i*50+49)]:
+                ids_parameter += id[0] + '%2C'
+            if (len(artist_ids[(i*50):(i*50+49)]) == 49):
+                ids_parameter += artist_ids[(i*50+49)][0]
 
-                response = requests.get(API_BASE_URL + f'artists?ids={ids_parameter}', headers=headers)
-                #print(type(response))
-            
-                try:
-                    artists = response.json()
-                    if (pickling == True):
+            response = requests.get(API_BASE_URL + f'artists?ids={ids_parameter}', headers=headers)
+            #print(type(response))
+
+            try:
+                artists = response.json()
+                if (pickling == True):
+                    with open("debug_files/debug_artists.pickle", "wb") as debug_artists:
                         pickle.dump(artists, debug_artists)
-                except ValueError:
-                    if (str(response) == '<Response [429]>'):
-                        print('Too many requests')
-                    else:
-                        print('Unexpected error')
-                    return None
-
-                if 'error' not in artists:
-                    add_artists_to_database(artists, cursor, connection)
+            except ValueError:
+                if (str(response) == '<Response [429]>'):
+                    print('Too many requests')
                 else:
-                    return artists['error']['status']
+                    print('Unexpected error')
+                return None
+
+            if 'error' not in artists:
+                add_artists_to_database(artists, cursor, connection)
+            else:
+                return artists['error']['status']
 
     else:
         with open("debug_files/debug_artists.pickle", "rb") as debug_artists:
@@ -533,6 +539,11 @@ def refresh_token():
         session['expires_at'] = datetime.now().timestamp() + new_token_info['expires_in']
 
         return redirect('/sort-saved-songs')
+
+@app.route('/testing')
+def testing():
+    return render_template('testing.html')
+
 
 debug_local = False
 pickling = False
