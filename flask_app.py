@@ -16,9 +16,9 @@ from PIL import Image, ImageOps
 from io import BytesIO
 from flask import *
 
+load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
@@ -26,8 +26,6 @@ REDIRECT_URI = os.getenv("REDIRECT_URI")
 AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
 API_BASE_URL = 'https://api.spotify.com/v1/'
-
-PLAYLIST_NAMES = {}
 
 @app.route('/')
 def index():
