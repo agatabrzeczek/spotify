@@ -88,6 +88,7 @@ def sort_saved_songs():
     if datetime.now().timestamp() >= session['expires_at']:
         return redirect('/refresh-token')
 
+    print(os.getcwd())
     connection = sqlite3.connect('./spotify.db')
     cursor = connection.cursor()
 
