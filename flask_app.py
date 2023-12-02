@@ -62,7 +62,7 @@ def callback():
         req_body = {
             'code': request.args['code'],
             'grant_type': 'authorization_code',
-            'redirect_uri': g.REDIRECT_URI,
+            'redirect_uri': os.getenv("REDIRECT_URI"),
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET
         }
