@@ -63,8 +63,8 @@ def callback():
             'code': request.args['code'],
             'grant_type': 'authorization_code',
             'redirect_uri': os.getenv("REDIRECT_URI"),
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET
+            'client_id': os.getenv("CLIENT_ID"),
+            'client_secret': os.getenv("CLIENT_SECRET")
         }
 
         response = requests.post(TOKEN_URL, data=req_body)
@@ -537,8 +537,8 @@ def refresh_token():
         req_body = {
             'grant_type': 'refresh_token',
             'refresh_token': session['refresh_token'],
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRET
+            'client_id': os.getenv("CLIENT_ID"),
+            'client_secret': os.getenv("CLIENT_SECRET")
         }
 
         response = requests.post(TOKEN_URL, data=req_body)
