@@ -38,7 +38,7 @@ def login():
 
     CLIENT_ID = os.getenv("CLIENT_ID")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-    g.REDIRECT_URI = os.getenv("REDIRECT_URI")
+    REDIRECT_URI = os.getenv("REDIRECT_URI")
 
     scope = 'user-library-read playlist-modify-public playlist-modify-private ugc-image-upload'
 
