@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from flask import Flask, redirect, request, jsonify, session
+from flask import Flask, redirect, request, jsonify, session, g
 import requests
 import urllib.parse
 from datetime import datetime
@@ -551,6 +551,8 @@ debug_local = False
 pickling = False
 
 if __name__ == '__main__':
+
+    load_dotenv()
 
     CLIENT_ID = os.getenv("CLIENT_ID")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
