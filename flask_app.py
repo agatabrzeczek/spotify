@@ -89,7 +89,7 @@ def sort_saved_songs():
         return redirect('/refresh-token')
 
     print(f"PRINT: {os.getcwd()}")
-    connection = sqlite3.connect('./spotify.db')
+    connection = sqlite3.connect('./spotify/spotify.db')
     cursor = connection.cursor()
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS songs (id TEXT UNIQUE, title TEXT, artist_id TEXT, album_id TEXT, year INTEGER); ''')
