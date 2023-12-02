@@ -38,7 +38,7 @@ def login():
 
     CLIENT_ID = os.getenv("CLIENT_ID")
     CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-    REDIRECT_URI = os.getenv("REDIRECT_URI")
+    g.REDIRECT_URI = os.getenv("REDIRECT_URI")
 
     scope = 'user-library-read playlist-modify-public playlist-modify-private ugc-image-upload'
 
@@ -62,7 +62,7 @@ def callback():
         req_body = {
             'code': request.args['code'],
             'grant_type': 'authorization_code',
-            'redirect_uri': REDIRECT_URI,
+            'redirect_uri': g.REDIRECT_URI,
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET
         }
