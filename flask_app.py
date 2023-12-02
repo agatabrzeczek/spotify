@@ -19,9 +19,9 @@ from flask import *
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
+# CLIENT_ID = os.getenv("CLIENT_ID")
+# CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+# REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
@@ -551,6 +551,11 @@ debug_local = False
 pickling = False
 
 if __name__ == '__main__':
+
+    CLIENT_ID = os.getenv("CLIENT_ID")
+    CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+    REDIRECT_URI = os.getenv("REDIRECT_URI")
+
     app.run(host='0.0.0.0',
             port=80,
             debug=False)
