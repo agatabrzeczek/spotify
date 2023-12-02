@@ -327,7 +327,7 @@ def group_songs_by_genre(cursor, connection):
         if len(songs_by_genre[genre]) < 10:
             genres_to_be_removed.append(genre)
 
-    print(songs_by_genre['pop'])
+    print(f"PRINT: {songs_by_genre['pop']}")
 
     for genre in genres_to_be_removed:  
         songs_by_genre.pop(genre)
