@@ -433,9 +433,6 @@ def initialize_playlists(songs_by_genre, songs_by_decade):
 
     try:
         for playlist in playlists['items']:
-            for playlist_criterion in PLAYLIST_NAMES:
-                if (playlist['name'] == PLAYLIST_NAMES[playlist_criterion]):
-                    playlist_ids[playlist_criterion] = playlist['id']
             for playlist_criterion in criterias:
                 if playlist_ids[playlist_criterion] == '':
                     if playlist['name'] == f'Your {playlist_criterion} songs by Agata':
@@ -454,10 +451,7 @@ def initialize_playlists(songs_by_genre, songs_by_decade):
 
     for playlist_criterion in playlist_ids:
         if (playlist_ids[playlist_criterion] == ''):
-            if (playlist_criterion in PLAYLIST_NAMES):
-                data['name'] = PLAYLIST_NAMES[playlist_criterion]
-            else:
-                data['name'] = f'Your {playlist_criterion} songs by Agata'
+            data['name'] = f'Your {playlist_criterion} songs by Agata'
             response = requests.post(API_BASE_URL + f'users/{user_id}/playlists', headers=headers, json=data)
             playlist_ids[playlist_criterion] = response.json()['id']
 
