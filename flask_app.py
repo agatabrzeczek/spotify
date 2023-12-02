@@ -33,6 +33,13 @@ def index():
 
 @app.route('/login')
 def login():
+
+    load_dotenv()
+
+    CLIENT_ID = os.getenv("CLIENT_ID")
+    CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+    REDIRECT_URI = os.getenv("REDIRECT_URI")
+
     scope = 'user-library-read playlist-modify-public playlist-modify-private ugc-image-upload'
 
     params = {
@@ -551,13 +558,6 @@ debug_local = False
 pickling = False
 
 if __name__ == '__main__':
-
-    load_dotenv()
-
-    CLIENT_ID = os.getenv("CLIENT_ID")
-    CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-    REDIRECT_URI = os.getenv("REDIRECT_URI")
-
     app.run(host='0.0.0.0',
             port=80,
             debug=False)
