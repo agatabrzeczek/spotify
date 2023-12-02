@@ -330,7 +330,7 @@ def group_songs_by_genre(cursor, connection):
     for genre in genres_to_be_removed:  
         songs_by_genre.pop(genre)
 
-    print(songs_by_genre[pop])
+    print(songs_by_genre['pop'])
     return songs_by_genre
 
     # add_songs_to_playlist(electronic_songs, playlist_ids['electronic'])
