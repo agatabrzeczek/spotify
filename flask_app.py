@@ -314,6 +314,8 @@ def group_songs_by_genre(cursor, connection):
     songs_by_genre['rap'] = []
     songs_by_genre['rock'] = []
 
+    print(f"PRINT: {data}")
+
     for item in data:
             
         song_id = item[0]
