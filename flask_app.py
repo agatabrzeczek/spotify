@@ -49,6 +49,7 @@ def login():
         'redirect_uri': REDIRECT_URI
     }
 
+    print(AUTH_URL)
     auth_url = f'{AUTH_URL}?{urllib.parse.urlencode(params)}'
 
     return redirect(auth_url)
